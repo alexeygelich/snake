@@ -1,0 +1,24 @@
+ul {
+  list-style: none;
+  width: 550px;
+  margin: 0 auto;
+  margin-top: 100px;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #444;
+}
+
+.isActive {
+  background-color: #444;
+}
+
+li {
+  display: flex;
+}
+
+.target {
+  background-color: rgb(212, 59, 59);
+}
