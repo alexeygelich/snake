@@ -13,7 +13,7 @@ function App() {
   const [error, setError] = useState(false);
   const [count, setCount] = useState(0);
   const [time, setTime] = useState(500);
-  const [dirrection, setDirrection] = useState(null);
+  const [direction, setDirection] = useState(null);
   const cell = [];
   const raw = [];
   let intervalID = useRef(null);
@@ -75,7 +75,7 @@ function App() {
   useEffect(() => {
     const arowDownFn = () => {
       clearInterval(intervalID.current);
-      if (dirrection === "ArrowUp") {
+      if (direction === "ArrowUp") {
         return;
       }
 
@@ -86,7 +86,7 @@ function App() {
 
     const arowUpFn = () => {
       clearInterval(intervalID.current);
-      if (dirrection === "ArrowDown") {
+      if (direction === "ArrowDown") {
         return;
       }
 
@@ -97,7 +97,7 @@ function App() {
 
     const arowRightFn = () => {
       clearInterval(intervalID.current);
-      if (dirrection === "ArrowLeft") {
+      if (direction === "ArrowLeft") {
         return;
       }
 
@@ -108,7 +108,7 @@ function App() {
 
     const arowLeftFn = () => {
       clearInterval(intervalID.current);
-      if (dirrection === "ArrowRight") {
+      if (direction === "ArrowRight") {
         return;
       }
 
@@ -117,11 +117,11 @@ function App() {
       }, time);
     };
 
-    if (dirrection && !error) {
-      dirrection === "ArrowDown" && arowDownFn();
-      dirrection === "ArrowUp" && arowUpFn();
-      dirrection === "ArrowRight" && arowRightFn();
-      dirrection === "ArrowLeft" && arowLeftFn();
+    if (direction && !error) {
+      direction === "ArrowDown" && arowDownFn();
+      direction === "ArrowUp" && arowUpFn();
+      direction === "ArrowRight" && arowRightFn();
+      direction === "ArrowLeft" && arowLeftFn();
     }
     const moveFn = (moveDown) => {
       setXY((prev) => {
@@ -131,19 +131,19 @@ function App() {
         switch (moveDown) {
           case "Right":
             newPoint[0] += 1;
-            setDirrection(() => "ArrowRight");
+            setDirection(() => "ArrowRight");
             break;
           case "Left":
             newPoint[0] -= 1;
-            setDirrection(() => "ArrowLeft");
+            setDirection(() => "ArrowLeft");
             break;
           case "Down":
             newPoint[1] += 1;
-            setDirrection(() => "ArrowDown");
+            setDirection(() => "ArrowDown");
             break;
           case "Up":
             newPoint[1] -= 1;
-            setDirrection(() => "ArrowUp");
+            setDirection(() => "ArrowUp");
             break;
         }
         if (newPoint[0] > 14 || newPoint[1] > 14 || newPoint[0] < 0 || newPoint[1] < 0) {
@@ -157,29 +157,32 @@ function App() {
     };
 
     const arrowClick = ({ key }) => {
+      if (error) {
+        return window.removeEventListener("keydown", arrowClick);
+      }
       if (key === "ArrowDown") {
-        if (dirrection === "ArrowDown" || dirrection === "ArrowUp") {
+        if (direction === "ArrowDown" || direction === "ArrowUp") {
           return;
         }
         arowDownFn();
       }
 
       if (key === "ArrowUp") {
-        if (dirrection === "ArrowUp" || dirrection === "ArrowDown") {
+        if (direction === "ArrowUp" || direction === "ArrowDown") {
           return;
         }
         arowUpFn();
       }
 
       if (key === "ArrowRight") {
-        if (dirrection === "ArrowRight" || dirrection === "ArrowLeft") {
+        if (direction === "ArrowRight" || direction === "ArrowLeft") {
           return;
         }
         arowRightFn();
       }
 
       if (key === "ArrowLeft") {
-        if (dirrection === "ArrowLeft" || dirrection === "ArrowRight") {
+        if (direction === "ArrowLeft" || direction === "ArrowRight") {
           return;
         }
         arowLeftFn();
@@ -191,7 +194,7 @@ function App() {
       clearInterval(intervalID.current);
       window.removeEventListener("keydown", arrowClick);
     };
-  }, [dirrection, error, time]);
+  }, [direction, error, time]);
 
   for (let i = 0; i < 15; i++) {
     cell.push(i);
