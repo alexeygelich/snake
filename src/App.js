@@ -63,9 +63,8 @@ function App() {
 
   useEffect(() => {
     const arrowClick = ({ key }) => {
-
       if (key === "ArrowDown") {
-        if (direction.current === "ArrowDown") {
+        if (direction.current === "ArrowUp") {
           return;
         }
 
@@ -73,7 +72,7 @@ function App() {
       }
 
       if (key === "ArrowUp") {
-        if (direction.current === "ArrowUp") {
+        if (direction.current === "ArrowDown") {
           return;
         }
 
@@ -81,7 +80,7 @@ function App() {
       }
 
       if (key === "ArrowRight") {
-        if (direction.current === "ArrowRight") {
+        if (direction.current === "ArrowLeft") {
           return;
         }
 
@@ -89,7 +88,7 @@ function App() {
       }
 
       if (key === "ArrowLeft") {
-        if (direction.current === "ArrowLeft") {
+        if (direction.current === "ArrowRight") {
           return;
         }
 
@@ -106,7 +105,7 @@ function App() {
   useEffect(() => {
     if (error) {
       clearInterval(intervalID.current);
-      return
+      return;
     }
     const testFn = (array) => {
       let isError = false;
