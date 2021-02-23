@@ -12,9 +12,9 @@ function App() {
   const [yTarget, setYTarget] = useState(1);
   const [error, setError] = useState(false);
   const [count, setCount] = useState(0);
-  const [time, setTime] = useState(500);
-  const [direction, setDirection] = useState(null);
-  const [moved, setMoved] = useState(null);
+  const [time, setTime] = useState(300);
+
+  let direction = useRef(null);
   const cell = [];
   const raw = [];
   let intervalID = useRef(null);
@@ -49,7 +49,7 @@ function App() {
 
       newTarget();
 
-      setTime((prev) => Math.round(prev * 0.93));
+      setTime((prev) => Math.round(prev * 0.96));
       return;
     }
 
@@ -62,6 +62,52 @@ function App() {
   }, [xTarget, xy, yTarget]);
 
   useEffect(() => {
+    const arrowClick = ({ key }) => {
+
+      if (key === "ArrowDown") {
+        if (direction.current === "ArrowDown") {
+          return;
+        }
+
+        direction.current = "ArrowDown";
+      }
+
+      if (key === "ArrowUp") {
+        if (direction.current === "ArrowUp") {
+          return;
+        }
+
+        direction.current = "ArrowUp";
+      }
+
+      if (key === "ArrowRight") {
+        if (direction.current === "ArrowRight") {
+          return;
+        }
+
+        direction.current = "ArrowRight";
+      }
+
+      if (key === "ArrowLeft") {
+        if (direction.current === "ArrowLeft") {
+          return;
+        }
+
+        direction.current = "ArrowLeft";
+      }
+    };
+
+    window.addEventListener("keydown", arrowClick);
+    return () => {
+      window.removeEventListener("keydown", arrowClick);
+    };
+  }, [error]);
+
+  useEffect(() => {
+    if (error) {
+      clearInterval(intervalID.current);
+      return
+    }
     const testFn = (array) => {
       let isError = false;
       const firstEl = array[array.length - 1];
@@ -82,22 +128,18 @@ function App() {
         switch (moveDown) {
           case "Right":
             newPoint[0] += 1;
-            setMoved("ArrowRight");
             break;
 
           case "Left":
             newPoint[0] -= 1;
-            setMoved("ArrowLeft");
             break;
 
           case "Down":
             newPoint[1] += 1;
-            setMoved("ArrowDown");
             break;
 
           case "Up":
             newPoint[1] -= 1;
-            setMoved("ArrowUp");
             break;
         }
         if (newPoint[0] > 14 || newPoint[1] > 14 || newPoint[0] < 0 || newPoint[1] < 0) {
@@ -109,97 +151,16 @@ function App() {
         return testFn(newCoord) ? prev : newCoord;
       });
     };
-
-    const arowDownFn = () => {
-      clearInterval(intervalID.current);
-
-      intervalID.current = setInterval(() => {
-        moveFn("Down");
-      }, time);
-    };
-
-    const arowUpFn = () => {
-      clearInterval(intervalID.current);
-
-      intervalID.current = setInterval(() => {
-        moveFn("Up");
-      }, time);
-    };
-
-    const arowRightFn = () => {
-      clearInterval(intervalID.current);
-
-      intervalID.current = setInterval(() => {
-        moveFn("Right");
-      }, time);
-    };
-
-    const arowLeftFn = () => {
-      clearInterval(intervalID.current);
-
-      intervalID.current = setInterval(() => {
-        moveFn("Left");
-      }, time);
-    };
-
-    if (moved && !error) {
-      moved === "ArrowDown" && arowDownFn();
-      moved === "ArrowUp" && arowUpFn();
-      moved === "ArrowRight" && arowRightFn();
-      moved === "ArrowLeft" && arowLeftFn();
-    }
-
-    const arrowClick = ({ key }) => {
-      if (error) {
-        return window.removeEventListener("keydown", arrowClick);
-      }
-      if (key === "ArrowDown") {
-        if (direction === "ArrowDown" || moved === "ArrowUp") {
-          return;
-        }
-        clearInterval(intervalID.current);
-        setDirection("ArrowDown");
-        moveFn("Down");
-        arowDownFn();
-      }
-
-      if (key === "ArrowUp") {
-        if (direction === "ArrowUp" || moved === "ArrowDown") {
-          return;
-        }
-        clearInterval(intervalID.current);
-        setDirection("ArrowUp");
-        moveFn("Up");
-        arowUpFn();
-      }
-
-      if (key === "ArrowRight") {
-        if (direction === "ArrowRight" || moved === "ArrowLeft") {
-          return;
-        }
-        clearInterval(intervalID.current);
-        setDirection("ArrowRight");
-        moveFn("Right");
-        arowRightFn();
-      }
-
-      if (key === "ArrowLeft") {
-        if (direction === "ArrowLeft" || moved === "ArrowRight") {
-          return;
-        }
-        clearInterval(intervalID.current);
-        setDirection("ArrowLeft");
-        moveFn("Left");
-        arowLeftFn();
-      }
-    };
-
-    window.addEventListener("keydown", arrowClick);
+    intervalID.current = setInterval(() => {
+      direction.current === "ArrowDown" && moveFn("Down");
+      direction.current === "ArrowUp" && moveFn("Up");
+      direction.current === "ArrowRight" && moveFn("Right");
+      direction.current === "ArrowLeft" && moveFn("Left");
+    }, time);
     return () => {
       clearInterval(intervalID.current);
-      window.removeEventListener("keydown", arrowClick);
     };
-  }, [direction, error, moved, time]);
+  }, [error, time]);
 
   for (let i = 0; i < 15; i++) {
     cell.push(i);
