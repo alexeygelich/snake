@@ -14,10 +14,10 @@ function App() {
   const [count, setCount] = useState(0);
   const [time, setTime] = useState(300);
 
-  let direction = useRef(null);
+  let direction = useRef('');
   const cell = [];
   const raw = [];
-  let intervalID = useRef(null);
+  let intervalID = useRef(NaN);
 
   useEffect(() => {
     const newTarget = () => {
@@ -61,8 +61,12 @@ function App() {
     });
   }, [xTarget, xy, yTarget]);
 
+  interface IProp {
+    key: string;
+  }
+
   useEffect(() => {
-    const arrowClick = ({ key }) => {
+    const arrowClick = ({ key }: IProp) => {
       if (key === "ArrowDown") {
         if (direction.current === "ArrowUp") {
           return;
@@ -107,7 +111,12 @@ function App() {
       clearInterval(intervalID.current);
       return;
     }
-    const testFn = (array) => {
+
+    // interface ITest {
+    //   array: number[]
+    // }
+
+    const testFn = (array: number[][]) => {
       let isError = false;
       const firstEl = array[array.length - 1];
       array.slice(0, array.length - 2).forEach((coord) => {
@@ -119,7 +128,7 @@ function App() {
       return isError;
     };
 
-    const moveFn = (moveDown) => {
+    const moveFn = (moveDown: string) => {
       setXY((prev) => {
         let newCoord = prev.slice(1);
         let newPoint = JSON.parse(JSON.stringify(newCoord[newCoord.length - 1]));
@@ -150,7 +159,7 @@ function App() {
         return testFn(newCoord) ? prev : newCoord;
       });
     };
-    intervalID.current = setInterval(() => {
+    intervalID.current = window.setInterval(() => {
       direction.current === "ArrowDown" && moveFn("Down");
       direction.current === "ArrowUp" && moveFn("Up");
       direction.current === "ArrowRight" && moveFn("Right");
