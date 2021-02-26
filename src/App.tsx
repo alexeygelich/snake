@@ -112,10 +112,6 @@ function App() {
       return;
     }
 
-    // interface ITest {
-    //   array: number[]
-    // }
-
     const testFn = (array: number[][]) => {
       let isError = false;
       const firstEl = array[array.length - 1];
@@ -160,10 +156,20 @@ function App() {
       });
     };
     intervalID.current = window.setInterval(() => {
-      direction.current === "ArrowDown" && moveFn("Down");
-      direction.current === "ArrowUp" && moveFn("Up");
-      direction.current === "ArrowRight" && moveFn("Right");
-      direction.current === "ArrowLeft" && moveFn("Left");
+      switch (direction.current) {
+        case "ArrowDown":
+          moveFn("Down")
+          break;
+        case "ArrowUp":
+          moveFn("Up")
+          break;
+        case "ArrowRight":
+          moveFn("Right")
+          break;
+        case "ArrowLeft":
+          moveFn("Left")
+          break;
+      }
     }, time);
     return () => {
       clearInterval(intervalID.current);
