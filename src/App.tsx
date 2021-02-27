@@ -18,6 +18,7 @@ function App() {
   const [show, setShow] = useState(false);
 
   let direction = useRef('');
+  let prevdirection = '';
   const cell = [];
   const raw = [];
   let intervalID = useRef(NaN);
@@ -110,78 +111,80 @@ function App() {
     };
   }, [error]);
 
+  const testFn = (array: number[][]) => {
+    let isError = false;
+    const firstEl = array[array.length - 1];
+    array.slice(0, array.length - 2).forEach((coord) => {
+      if (firstEl[0] === coord[0] && firstEl[1] === coord[1]) {
+        setError(true);
+        setShow(true);
+        return (isError = true);
+      }
+    });
+    return isError;
+  };
+
+  const moveFn = (moveDown: string) => {
+    setXY((prev) => {
+      let newCoord = prev.slice(1);
+      let newPoint = JSON.parse(JSON.stringify(newCoord[newCoord.length - 1]));
+      // eslint-disable-next-line default-case
+      switch (moveDown) {
+        case "ArrowRight":
+          newPoint[0] += 1;
+          break;
+
+        case "ArrowLeft":
+          newPoint[0] -= 1;
+          break;
+
+        case "ArrowDown":
+          newPoint[1] += 1;
+          break;
+
+        case "ArrowUp":
+          newPoint[1] -= 1;
+          break;
+      }
+
+      if (newPoint[0] > 14 || newPoint[1] > 14 || newPoint[0] < 0 || newPoint[1] < 0) {
+        setError(() => true);
+        setShow(true);
+        return prev;
+      }
+
+      if (newPoint[0] === newCoord[newCoord.length - 2][0] && newPoint[1] === newCoord[newCoord.length - 2][1]) {
+        direction.current = prevdirection;
+        return prev
+      }
+
+      prevdirection = moveDown;
+
+      newCoord.push(newPoint);
+
+      return testFn(newCoord) ? prev : newCoord;
+    });
+  };
+
   useEffect(() => {
     if (error) {
       clearInterval(intervalID.current);
       return;
     }
 
-    const testFn = (array: number[][]) => {
-      let isError = false;
-      const firstEl = array[array.length - 1];
-      array.slice(0, array.length - 2).forEach((coord) => {
-        if (firstEl[0] === coord[0] && firstEl[1] === coord[1]) {
-          setError(true);
-          setShow(true);
-          return (isError = true);
-        }
-      });
-      return isError;
-    };
-
-    const moveFn = (moveDown: string) => {
-      setXY((prev) => {
-        let newCoord = prev.slice(1);
-        let newPoint = JSON.parse(JSON.stringify(newCoord[newCoord.length - 1]));
-        // eslint-disable-next-line default-case
-        switch (moveDown) {
-          case "Right":
-            newPoint[0] += 1;
-            break;
-
-          case "Left":
-            newPoint[0] -= 1;
-            break;
-
-          case "Down":
-            newPoint[1] += 1;
-            break;
-
-          case "Up":
-            newPoint[1] -= 1;
-            break;
-        }
-
-        if (newPoint[0] > 14 || newPoint[1] > 14 || newPoint[0] < 0 || newPoint[1] < 0) {
-          setError(() => true);
-          setShow(true);
-          return prev;
-        }
-
-        // if (newPoint[0] === newCoord[0][0] && newPoint[1] === newCoord[0][1]) {
-        //   console.log('123');
-        //   return prev
-        // }
-
-
-        newCoord.push(newPoint);
-
-        return testFn(newCoord) ? prev : newCoord;
-      });
-    };
     intervalID.current = window.setInterval(() => {
       switch (direction.current) {
         case "ArrowDown":
-          moveFn("Down")
+          moveFn("ArrowDown")
           break;
         case "ArrowUp":
-          moveFn("Up")
+          moveFn("ArrowUp")
           break;
         case "ArrowRight":
-          moveFn("Right")
+          moveFn("ArrowRight")
           break;
         case "ArrowLeft":
-          moveFn("Left")
+          moveFn("ArrowLeft")
           break;
       }
     }, time);
