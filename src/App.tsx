@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { Modal, Button } from 'react-bootstrap';
+
 import "./App.css";
 
 function App() {
@@ -13,6 +15,7 @@ function App() {
   const [error, setError] = useState(false);
   const [count, setCount] = useState(0);
   const [time, setTime] = useState(300);
+  const [show, setShow] = useState(false);
 
   let direction = useRef('');
   const cell = [];
@@ -39,7 +42,7 @@ function App() {
     const firstEl = xy[xy.length - 1];
 
     if (firstEl[0] === xTarget && firstEl[1] === yTarget) {
-      setCount((prev) => prev + 1);
+      setCount((prev) => prev + Math.round(xy.length * 1000 / time));
       setXY((prev) => {
         let newCoords = [...prev];
         let newCell = [...newCoords[0]];
@@ -56,6 +59,7 @@ function App() {
     xy.slice(0, xy.length - 2).forEach((coord) => {
       if (firstEl[0] === coord[0] && firstEl[1] === coord[1]) {
         setError(true);
+        setShow(true);
         return console.log("ERRORR!!!!");
       }
     });
@@ -118,6 +122,7 @@ function App() {
       array.slice(0, array.length - 2).forEach((coord) => {
         if (firstEl[0] === coord[0] && firstEl[1] === coord[1]) {
           setError(true);
+          setShow(true);
           return (isError = true);
         }
       });
@@ -146,10 +151,19 @@ function App() {
             newPoint[1] -= 1;
             break;
         }
+
         if (newPoint[0] > 14 || newPoint[1] > 14 || newPoint[0] < 0 || newPoint[1] < 0) {
           setError(() => true);
+          setShow(true);
           return prev;
         }
+
+        // if (newPoint[0] === newCoord[0][0] && newPoint[1] === newCoord[0][1]) {
+        //   console.log('123');
+        //   return prev
+        // }
+
+
         newCoord.push(newPoint);
 
         return testFn(newCoord) ? prev : newCoord;
@@ -176,6 +190,19 @@ function App() {
     };
   }, [error, time]);
 
+  const handleStartClick = () => {
+    setError(false);
+    setCount(0);
+    setTime(300);
+    setShow(false);
+    setXY([
+      [3, 3],
+      [3, 4],
+      [4, 4],
+    ]);
+    direction.current = 'ArrowRight';
+  }
+
   for (let i = 0; i < 15; i++) {
     cell.push(i);
   }
@@ -185,27 +212,44 @@ function App() {
   }
 
   return (
-    <div className="wrapper">
-      <ul>
-        {raw.map((rawItem, idxRaw) => (
-          <li key={uuidv4()}>
-            {rawItem.map((cell, idxCell) => {
-              if (idxRaw === yTarget && idxCell === xTarget) {
-                return <div key={uuidv4()} className="cell target"></div>;
-              }
-              let isActive = false;
-              xy.forEach((coord) => {
-                if (coord[0] === idxCell && coord[1] === idxRaw) {
-                  isActive = true;
+    <>
+      <div className="wrapper">
+        <ul>
+          {raw.map((rawItem, idxRaw) => (
+            <li key={uuidv4()}>
+              {rawItem.map((cell, idxCell) => {
+                if (idxRaw === yTarget && idxCell === xTarget) {
+                  return <div key={uuidv4()} className="cell target"></div>;
                 }
-              });
-              return <div key={uuidv4()} className={isActive ? "cell isActive" : "cell"}></div>;
-            })}
-          </li>
-        ))}
-      </ul>
-      <h1>Points: {count}</h1>
-    </div>
+                let isActive = false;
+                xy.forEach((coord) => {
+                  if (coord[0] === idxCell && coord[1] === idxRaw) {
+                    isActive = true;
+                  }
+                });
+                return <div key={uuidv4()} className={isActive ? "cell isActive" : "cell"}></div>;
+              })}
+            </li>
+          ))}
+        </ul>
+        <h1>Points: {count}</h1>
+      </div>
+      <Modal
+        show={show}
+        // onHide={() => setShow(false)}
+        dialogClassName="modal-90w"
+        aria-labelledby="example-custom-modal-styling-title"
+      >
+        <Modal.Header>
+          <Modal.Title id="example-custom-modal-styling-title">
+            Your results: {count} points
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Button variant="success" onClick={handleStartClick}>Try again</Button>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 }
 
