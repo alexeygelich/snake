@@ -1,16 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Modal, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
+import ModalWindow from './components/Modal/Modal'
 import "./App.css";
 
 interface IState {
   record: number;
+  area: number;
 }
 
 function App() {
-  const initialSate: IState = {
+  const initialState: IState = {
     record: Number(localStorage.getItem('record')) || 0,
+    area : 10,
   };
   const [xy, setXY] = useState([
     [3, 3],
@@ -19,11 +22,12 @@ function App() {
   ]);
   const [xTarget, setXTarget] = useState(Math.round(Math.random() * 14));
   const [yTarget, setYTarget] = useState(Math.round(Math.random() * 14));
+  const [area, setArea] = useState(initialState.area)
   const [error, setError] = useState(false);
   const [count, setCount] = useState(0);
   const [time, setTime] = useState(450);
   const [show, setShow] = useState(false);
-  const [record, setRecord] = useState(initialSate.record)
+  const [record, setRecord] = useState(initialState.record)
 
   let direction = useRef('');
   const cell = [];
@@ -263,20 +267,7 @@ function App() {
         </ul>
         <h1>Points: {count}</h1>
       </div>
-      <Modal
-        show={show}
-        dialogClassName="modal-90w"
-        aria-labelledby="example-custom-modal-styling-title"
-      >
-        <Modal.Header>
-          <Modal.Title id="example-custom-modal-styling-title">
-            Your results: {count} points
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Button variant="success" onClick={handleStartClick}>Try again</Button>
-        </Modal.Body>
-      </Modal>
+      <ModalWindow show={show} count={count} handleStartClick={handleStartClick}/>
     </>
   );
 }
