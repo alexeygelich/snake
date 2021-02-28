@@ -4,24 +4,39 @@ import { Modal, Button } from 'react-bootstrap';
 
 import "./App.css";
 
+interface IState {
+  record: number;
+}
+
 function App() {
+  const initialSate: IState = {
+    record: Number(localStorage.getItem('record')) || 0,
+  };
   const [xy, setXY] = useState([
     [3, 3],
     [3, 4],
     [4, 4],
   ]);
-  const [xTarget, setXTarget] = useState(1);
-  const [yTarget, setYTarget] = useState(1);
+  const [xTarget, setXTarget] = useState(Math.round(Math.random() * 14));
+  const [yTarget, setYTarget] = useState(Math.round(Math.random() * 14));
   const [error, setError] = useState(false);
   const [count, setCount] = useState(0);
-  const [time, setTime] = useState(300);
+  const [time, setTime] = useState(450);
   const [show, setShow] = useState(false);
+  const [record, setRecord] = useState(initialSate.record)
 
   let direction = useRef('');
   const cell = [];
   const raw = [];
   let intervalID = useRef(NaN);
   let isMoved = useRef(true);
+
+  const newRecord = () => {
+    if (count > record) {
+      setRecord(count);
+      localStorage.setItem('record', count.toString())
+    }
+  }
 
   useEffect(() => {
     const newTarget = () => {
@@ -60,6 +75,7 @@ function App() {
     xy.slice(0, xy.length - 2).forEach((coord) => {
       if (firstEl[0] === coord[0] && firstEl[1] === coord[1]) {
         setError(true);
+        newRecord();
         setShow(true);
         return console.log("ERRORR!!!!");
       }
@@ -129,6 +145,7 @@ function App() {
       array.slice(0, array.length - 2).forEach((coord) => {
         if (firstEl[0] === coord[0] && firstEl[1] === coord[1]) {
           setError(true);
+          newRecord();
           setShow(true);
           return (isError = true);
         }
@@ -161,6 +178,7 @@ function App() {
 
         if (newPoint[0] > 14 || newPoint[1] > 14 || newPoint[0] < 0 || newPoint[1] < 0) {
           setError(() => true);
+          newRecord();
           setShow(true);
           return prev;
         }
@@ -195,15 +213,21 @@ function App() {
 
   const handleStartClick = () => {
     setError(false);
+
     setCount(0);
-    setTime(300);
+    setTime(450);
     setShow(false);
     setXY([
       [3, 3],
       [3, 4],
       [4, 4],
     ]);
-    direction.current = 'ArrowRight';
+    direction.current = '';
+  }
+
+  const handleClearRecord = () => {
+    setRecord(0);
+    localStorage.clear();
   }
 
   for (let i = 0; i < 15; i++) {
@@ -216,6 +240,8 @@ function App() {
 
   return (
     <>
+      <h1>Record: {record}</h1>
+      <Button variant="success" onClick={handleClearRecord}>Clear record</Button>
       <div className="wrapper">
         <ul>
           {raw.map((rawItem, idxRaw) => (
@@ -239,7 +265,6 @@ function App() {
       </div>
       <Modal
         show={show}
-        // onHide={() => setShow(false)}
         dialogClassName="modal-90w"
         aria-labelledby="example-custom-modal-styling-title"
       >
